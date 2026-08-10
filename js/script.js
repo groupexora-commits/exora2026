@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
           formStatus.textContent = "Please select a current or future start date.";
         }
         dateInput.focus();
-        return; 
+        return;
       }
     }
 

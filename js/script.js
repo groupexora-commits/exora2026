@@ -130,6 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (dateInput && dateInput.value) {
       const selectedDate = new Date(dateInput.value);
+      // Create a date object for today with time set to 00:00:00
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -138,21 +139,16 @@ document.addEventListener("DOMContentLoaded", () => {
           formStatus.textContent = "Please select a current or future start date.";
         }
         dateInput.focus();
-        return;
+        return; // Stops form submission
       }
     }
 
     const formData = new FormData(form);
-
-    // Required by Netlify when using AJAX/fetch with file uploads
     fetch("/", {
       method: "POST",
       body: formData
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Form submission failed");
-        }
+      .then(() => {
         if (formStatus) {
           formStatus.textContent = "Thank you — we will be in touch shortly with your quote.";
         }

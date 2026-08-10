@@ -144,11 +144,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const formData = new FormData(form);
+
+    if (!formData.get("form-name")) {
+      formData.append("form-name", "contact");
+    }
+
     fetch("/", {
       method: "POST",
-      body: formData
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formData).toString()
     })
-      .then(() => {
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Form submission failed");
+        }
         if (formStatus) {
           formStatus.textContent = "Thank you — we will be in touch shortly with your quote.";
         }

@@ -1,3 +1,6 @@
+const CLOUD_NAME = "ojuw82bj";
+const UPLOAD_PRESET = "exora_group";
+
 document.addEventListener("DOMContentLoaded", () => {
   const header = document.querySelector(".header");
   const navToggle = document.querySelector(".nav-toggle");
@@ -12,8 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const formStatus = document.querySelector(".form-status");
   const year = document.querySelector("[data-year]");
   const body = document.body;
-  const CLOUD_NAME = "ojuw82bj"; 
-  const UPLOAD_PRESET = "Exora_Group";
 
   if (year) {
     year.textContent = new Date().getFullYear();
@@ -154,11 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        // Upload all selected files to Cloudinary
         for (let i = 0; i < fileInput.files.length; i++) {
           let file = fileInput.files[i];
 
-          // Compress locally prior to upload if compression script is loaded
           if (window.imageCompression) {
             try {
               file = await imageCompression(file, { maxSizeMB: 1, maxWidthOrHeight: 1920 });
@@ -182,7 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
           uploadedUrls.push(cloudJson.secure_url);
         }
 
-        // Attach image URLs as a comma-separated list into the hidden input
         if (photoLinksInput) {
           photoLinksInput.value = uploadedUrls.join("\n");
         }
@@ -199,7 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
       formStatus.textContent = "Sending request...";
     }
 
-    // Build Netlify form payload (without sending bulky raw file blobs)
     const formData = new FormData(form);
     if (!formData.get("form-name")) {
       formData.append("form-name", "contact");

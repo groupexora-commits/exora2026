@@ -317,9 +317,11 @@
           </div>
         </div>
 
-        <form name="contact" action="/" class="contact-form glass reveal" id="contact-form" method="POST" data-netlify="true" enctype="multipart/form-data">
+        <form name="contact" action="/" class="contact-form glass reveal" id="contact-form" method="POST" data-netlify="true">
           
           <input type="hidden" name="form-name" value="contact" />
+
+          <input type="hidden" name="photo_links" id="photo-links" />
           
           <label>
             Full Name
@@ -401,7 +403,6 @@
           <label class="full-width">
             Upload Photos of Your Space (Optional)
             <input type="file" accept="image/*" multiple id="photo-upload">
-            <input type="hidden" name="photo_links" id="photo-links">
           </label>
           <label class="full-width">
             Additional Details

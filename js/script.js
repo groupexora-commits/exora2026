@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (photoLinksInput) {
-          photoLinksInput.value = uploadedUrls.join("\n");
+          photoLinksInput.value = uploadedUrls.join(", ");
         }
       } catch (err) {
         console.error("Upload error:", err);
@@ -200,7 +200,8 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await fetch("/", {
         method: "POST",
-        body: formData
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(formData).toString()
       });
 
       if (!response.ok) {

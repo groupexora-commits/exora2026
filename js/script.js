@@ -144,11 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
     }
-// Ensure raw files are not sent in the final Netlify payload
-    const formData = new FormData(form);
-    formData.delete("photos");
-    formData.delete("photos[]");
-    
+
     const fileInput = document.getElementById("photo-upload");
     const photoLinksInput = document.getElementById("photo-links");
     const uploadedUrls = [];
@@ -162,9 +158,14 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let i = 0; i < fileInput.files.length; i++) {
           let file = fileInput.files[i];
 
+          // Compress and preserve JPG format
           if (window.imageCompression) {
             try {
-              file = await imageCompression(file, { maxSizeMB: 1, maxWidthOrHeight: 1920 });
+              file = await imageCompression(file, {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1920,
+                fileType: "image/jpeg"
+              });
             } catch (e) {
               console.warn("Compression skipped for:", file.name);
             }
@@ -201,6 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
       formStatus.textContent = "Sending request...";
     }
 
+    // Build single FormData payload for Netlify submission
     const formData = new FormData(form);
     if (!formData.get("form-name")) {
       formData.append("form-name", "contact");

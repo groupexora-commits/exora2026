@@ -125,11 +125,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  form?.addEventListener("submit", (event) => {
-    event.preventDefault();
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault(); // Prevent default browser submit
+
+    // 1. Validate date input
     if (dateInput && dateInput.value) {
       const selectedDate = new Date(dateInput.value);
-      // Create a date object for today with time set to 00:00:00
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -138,43 +139,77 @@ document.addEventListener("DOMContentLoaded", () => {
           formStatus.textContent = "Please select a current or future start date.";
         }
         dateInput.focus();
-        return; // Stops form submission
+        return;
       }
     }
 
+    if (formStatus) {
+      formStatus.textContent = "Processing and uploading files, please wait...";
+    }
+
+    // 2. Build initial FormData from text fields
     const formData = new FormData(form);
 
     if (!formData.get("form-name")) {
       formData.append("form-name", "contact");
     }
 
-    // Handle multiple file attachments explicitly
+    // Remove raw photo entries from initial FormData
+    formData.delete("photos");
+    formData.delete("photos[]");
+
+    // 3. Compress each photo before appending
     const fileInput = document.getElementById("photo-upload");
+
     if (fileInput && fileInput.files.length > 0) {
-      formData.delete("photos"); // Remove default single-item entry
-      for (let i = 0; i < fileInput.files.length; i++) {
-        formData.append("photos", fileInput.files[i]);
+      const compressionOptions = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true
+      };
+
+      try {
+        for (let i = 0; i < fileInput.files.length; i++) {
+          const file = fileInput.files[i];
+          let fileToUpload = file;
+
+          // Attempt compression if imageCompression library is loaded
+          if (window.imageCompression) {
+            try {
+              fileToUpload = await imageCompression(file, compressionOptions);
+            } catch (err) {
+              console.warn("Compression failed for file, using original:", file.name);
+            }
+          }
+
+          // Key fix: Netlify needs individual keys named "photos" for each file
+          formData.append("photos", fileToUpload, file.name);
+        }
+      } catch (error) {
+        console.error("File processing error:", error);
       }
     }
 
-    fetch("/", {
-      method: "POST",
-      body: formData
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Form submission failed");
-        }
-        if (formStatus) {
-          formStatus.textContent = "Thank you — we will be in touch shortly with your quote.";
-        }
-        form.reset();
-      })
-      .catch(() => {
-        if (formStatus) {
-          formStatus.textContent = "An error occurred. Please try again.";
-        }
+    // 4. Submit to Netlify
+    try {
+      const response = await fetch("/", {
+        method: "POST",
+        body: formData
       });
+
+      if (!response.ok) {
+        throw new Error("Form submission failed");
+      }
+
+      if (formStatus) {
+        formStatus.textContent = "Thank you — we will be in touch shortly with your quote.";
+      }
+      form.reset();
+    } catch (error) {
+      if (formStatus) {
+        formStatus.textContent = "An error occurred while sending your request. Please try again.";
+      }
+    }
   });
 
   const galleryImages = Array.from(document.querySelectorAll("#gallery img"));

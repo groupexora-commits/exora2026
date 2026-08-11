@@ -156,20 +156,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         for (let i = 0; i < fileInput.files.length; i++) {
+          // Send the raw file exactly as the user selected it
           let file = fileInput.files[i];
-
-          // Compress and preserve JPG format
-          if (window.imageCompression) {
-            try {
-              file = await imageCompression(file, {
-                maxSizeMB: 1,
-                maxWidthOrHeight: 1920,
-                fileType: "image/jpeg"
-              });
-            } catch (e) {
-              console.warn("Compression skipped for:", file.name);
-            }
-          }
 
           const cloudinaryData = new FormData();
           cloudinaryData.append("file", file);
@@ -183,6 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (!cloudRes.ok) throw new Error("Cloudinary upload failed");
 
           const cloudJson = await cloudRes.json();
+          // cloudJson.secure_url will contain the direct link
           uploadedUrls.push(cloudJson.secure_url);
         }
 

@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const formStatus = document.querySelector(".form-status");
   const year = document.querySelector("[data-year]");
   const body = document.body;
+  const CLOUD_NAME = "ojuw82bj"; 
+  const UPLOAD_PRESET = "Exora_Group";
 
   if (year) {
     year.textContent = new Date().getFullYear();
@@ -126,9 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   form?.addEventListener("submit", async (event) => {
-    event.preventDefault(); // Prevent default browser submit
+    event.preventDefault();
 
-    // 1. Validate date input
     if (dateInput && dateInput.value) {
       const selectedDate = new Date(dateInput.value);
       const today = new Date();
@@ -143,54 +144,67 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    if (formStatus) {
-      formStatus.textContent = "Processing and uploading files, please wait...";
+    const fileInput = document.getElementById("photo-upload");
+    const photoLinksInput = document.getElementById("photo-links");
+    const uploadedUrls = [];
+
+    if (fileInput && fileInput.files.length > 0) {
+      if (formStatus) {
+        formStatus.textContent = `Uploading ${fileInput.files.length} photo(s)... please wait.`;
+      }
+
+      try {
+        // Upload all selected files to Cloudinary
+        for (let i = 0; i < fileInput.files.length; i++) {
+          let file = fileInput.files[i];
+
+          // Compress locally prior to upload if compression script is loaded
+          if (window.imageCompression) {
+            try {
+              file = await imageCompression(file, { maxSizeMB: 1, maxWidthOrHeight: 1920 });
+            } catch (e) {
+              console.warn("Compression skipped for:", file.name);
+            }
+          }
+
+          const cloudinaryData = new FormData();
+          cloudinaryData.append("file", file);
+          cloudinaryData.append("upload_preset", UPLOAD_PRESET);
+
+          const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+            method: "POST",
+            body: cloudinaryData
+          });
+
+          if (!cloudRes.ok) throw new Error("Cloudinary upload failed");
+
+          const cloudJson = await cloudRes.json();
+          uploadedUrls.push(cloudJson.secure_url);
+        }
+
+        // Attach image URLs as a comma-separated list into the hidden input
+        if (photoLinksInput) {
+          photoLinksInput.value = uploadedUrls.join("\n");
+        }
+      } catch (err) {
+        console.error("Upload error:", err);
+        if (formStatus) {
+          formStatus.textContent = "Error uploading photos. Please try again.";
+        }
+        return;
+      }
     }
 
-    // 2. Build initial FormData from text fields
-    const formData = new FormData(form);
+    if (formStatus) {
+      formStatus.textContent = "Sending request...";
+    }
 
+    // Build Netlify form payload (without sending bulky raw file blobs)
+    const formData = new FormData(form);
     if (!formData.get("form-name")) {
       formData.append("form-name", "contact");
     }
 
-    // Remove raw photo entries from initial FormData
-    formData.delete("photos");
-    formData.delete("photos[]");
-
-    // 3. Compress each photo before appending
-    const fileInput = document.getElementById("photo-upload");
-
-    if (fileInput && fileInput.files.length > 0) {
-      const compressionOptions = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true
-      };
-
-      try {
-        for (let i = 0; i < fileInput.files.length; i++) {
-          const file = fileInput.files[i];
-          let fileToUpload = file;
-
-          // Attempt compression if imageCompression library is loaded
-          if (window.imageCompression) {
-            try {
-              fileToUpload = await imageCompression(file, compressionOptions);
-            } catch (err) {
-              console.warn("Compression failed for file, using original:", file.name);
-            }
-          }
-
-          // Key fix: Netlify needs individual keys named "photos" for each file
-          formData.append("photos", fileToUpload, file.name);
-        }
-      } catch (error) {
-        console.error("File processing error:", error);
-      }
-    }
-
-    // 4. Submit to Netlify
     try {
       const response = await fetch("/", {
         method: "POST",
@@ -207,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
       form.reset();
     } catch (error) {
       if (formStatus) {
-        formStatus.textContent = "An error occurred while sending your request. Please try again.";
+        formStatus.textContent = "An error occurred. Please try again.";
       }
     }
   });

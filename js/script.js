@@ -151,8 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fetch("/", {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(formData).toString()
+      body: formData
     })
       .then((response) => {
         if (!response.ok) {

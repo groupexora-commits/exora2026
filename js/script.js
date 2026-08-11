@@ -127,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form?.addEventListener("submit", (event) => {
     event.preventDefault();
-
     if (dateInput && dateInput.value) {
       const selectedDate = new Date(dateInput.value);
       // Create a date object for today with time set to 00:00:00
@@ -147,6 +146,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!formData.get("form-name")) {
       formData.append("form-name", "contact");
+    }
+
+    // Handle multiple file attachments explicitly
+    const fileInput = document.getElementById("photo-upload");
+    if (fileInput && fileInput.files.length > 0) {
+      formData.delete("photos"); // Remove default single-item entry
+      for (let i = 0; i < fileInput.files.length; i++) {
+        formData.append("photos", fileInput.files[i]);
+      }
     }
 
     fetch("/", {

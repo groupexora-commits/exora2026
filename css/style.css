@@ -821,12 +821,13 @@ section[id] {
   display: inline-flex;
 }
 
+/* Lightbox Base Styles */
 .gallery-lightbox {
-  display: none;
+  display: flex;
   position: fixed;
   inset: 0;
-  z-index: 1200;
-  background: rgba(0, 0, 0, 0.82);
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.92);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   justify-content: center;
@@ -849,59 +850,66 @@ section[id] {
   inset: 0;
 }
 
-.gallery-lightbox-close,
-.gallery-lightbox-prev,
-.gallery-lightbox-next {
-  position: absolute;
-  border: none;
-  cursor: pointer;
-  color: #fff;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.25s ease, background 0.25s ease;
-}
-
 .gallery-lightbox-close {
+  position: absolute;
   top: 18px;
   right: 18px;
+  z-index: 100001;
   width: 52px;
   height: 52px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 30px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .gallery-lightbox-prev,
 .gallery-lightbox-next {
+  position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  z-index: 100001;
   width: 50px;
   height: 50px;
-  border-radius: 999px;
+  border-radius: 50%;
+  color: #ffffff;
   font-size: 1.6rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .gallery-lightbox-prev {
   left: 16px;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .gallery-lightbox-next {
   right: 16px;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .gallery-lightbox-close:hover {
   transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .gallery-lightbox-prev:hover,
 .gallery-lightbox-next:hover {
   transform: translateY(-50%) scale(1.05);
+  background: rgba(0, 0, 0, 0.85);
 }
 
 .gallery-lightbox-content {
@@ -917,7 +925,7 @@ section[id] {
 
 .gallery-lightbox-image {
   max-width: 92vw;
-  max-height: 90vh;
+  max-height: 80vh;
   object-fit: contain;
   border-radius: 12px;
   box-shadow: 0 32px 90px rgba(0, 0, 0, 0.45);
@@ -938,47 +946,6 @@ section[id] {
 
   .services-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .contact-form {
-    grid-template-columns: 1fr;
-  }
-
-  .contact-form .full-width {
-    grid-column: auto;
-  }
-
-  .contact-top {
-    flex-direction: column;
-    gap: 30px;
-  }
-
-  .contact-copy {
-    max-width: 100%;
-  }
-
-  .contact-form input[type="date"] {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-  }
-
-  .review-header,
-  .reviews-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .review-link {
-    margin-top: 0;
   }
 }
 
@@ -1146,6 +1113,38 @@ section[id] {
     text-align: left;
     width: 100%;
   }
+
+  /* Lightbox Mobile Adjustments */
+  .gallery-lightbox {
+    padding: 12px;
+  }
+
+  .gallery-lightbox-close {
+    top: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    font-size: 26px;
+  }
+
+  .gallery-lightbox-prev,
+  .gallery-lightbox-next {
+    width: 44px;
+    height: 44px;
+    font-size: 1.4rem;
+  }
+
+  .gallery-lightbox-prev {
+    left: 8px;
+  }
+
+  .gallery-lightbox-next {
+    right: 8px;
+  }
+
+  .gallery-lightbox-image {
+    max-height: 75vh;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1216,7 +1215,6 @@ section[id] {
   cursor: pointer;
 }
 
-/* Styles the internal "Choose File" button */
 .contact-form input[type="file"]::file-selector-button {
   background: rgba(8, 19, 33, 0.05);
   border: 1px solid rgba(8, 19, 33, 0.1);

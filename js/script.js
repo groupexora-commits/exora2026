@@ -144,7 +144,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
     }
-
+// Ensure raw files are not sent in the final Netlify payload
+    const formData = new FormData(form);
+    formData.delete("photos");
+    formData.delete("photos[]");
+    
     const fileInput = document.getElementById("photo-upload");
     const photoLinksInput = document.getElementById("photo-links");
     const uploadedUrls = [];

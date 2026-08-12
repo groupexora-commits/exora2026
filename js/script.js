@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (photoLinksInput) {
-          photoLinksInput.value = uploadedUrls.join(", ");
+          photoLinksInput.value = uploadedUrls.join("\n\n");
         }
       } catch (err) {
         console.error("Upload error:", err);
